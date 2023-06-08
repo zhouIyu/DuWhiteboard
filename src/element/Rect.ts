@@ -1,8 +1,8 @@
-import { ElementOptions, Whiteboard } from '../../index'
+import { ElementOptions, ElementType, Whiteboard } from '../../index'
 import BaseElement from './BaseElement'
 
 export default class Rect extends BaseElement {
-  type: string = 'rect'
+  type: ElementType = 'rect'
 
   constructor(app: Whiteboard, options: ElementOptions) {
     super(app, options)

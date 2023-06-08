@@ -7,3 +7,8 @@ export enum ElementTypeEnum {
 export enum EmitEventEnum {
   StatusChange = 'statusChange'
 }
+
+export enum EventTypeEnum {
+  Select = 'select',
+  Rect = 'rect'
+}

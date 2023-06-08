@@ -1,7 +1,8 @@
-import { ElementOptions, Point, WhiteboardOptions, WhiteboardStatus } from '../index'
+import { ElementOptions, ElementType, EventType, Point, WhiteboardOptions, WhiteboardStatus } from '../index'
 import ElementFactory from './ElementFactory'
 import History from './History'
 import EventEmitter from 'eventemitter3'
+import { EmitEventEnum, EventTypeEnum } from './enum'
 
 export default class Whiteboard {
   canvas: HTMLCanvasElement // 画布
@@ -9,6 +10,7 @@ export default class Whiteboard {
   width: number = 300 // 默认宽度
   height: number = 150 // 默认高度
 
+  isCreateElement: boolean = false // 是否正在创建元素
   isMousedown: boolean = false // 是否按下鼠标
   mousedownPoint: Point = {
     // 按下鼠标时的坐标
@@ -18,7 +20,7 @@ export default class Whiteboard {
 
   status: WhiteboardStatus = {
     // 白板状态
-    type: '',
+    type: EventTypeEnum.Select,
     canRedo: false,
     canUndo: false
   }
@@ -90,16 +92,18 @@ export default class Whiteboard {
    * @param {MouseEvent} e
    */
   onMousedown(e: MouseEvent) {
-    this.isMousedown = true
     const { x, y } = e
+    this.isMousedown = true
     this.mousedownPoint = { x, y }
-    // 创建元素
-    this.elementFactory.createElement('rect', {
-      x,
-      y,
-      width: 0,
-      height: 0
-    })
+    if (this.isCreateElement) {
+      // 创建元素
+      this.elementFactory.createElement(this.status.type as ElementType, {
+        x,
+        y,
+        width: 0,
+        height: 0
+      })
+    }
   }
 
   /**
@@ -112,20 +116,22 @@ export default class Whiteboard {
     }
     const { x, y } = e
     const { x: startX, y: startY } = this.mousedownPoint
-    const dx = x - startX
-    const dy = y - startY
-    // 更新元素
-    const width = Math.abs(dx)
-    const height = Math.abs(dy)
-    const options: ElementOptions = {
-      width: width,
-      height: height,
-      x: dx < 0 ? x : startX,
-      y: dy < 0 ? y : startY
+    if (this.isCreateElement) {
+      const dx = x - startX
+      const dy = y - startY
+      // 更新元素
+      const width = Math.abs(dx)
+      const height = Math.abs(dy)
+      const options: ElementOptions = {
+        width: width,
+        height: height,
+        x: dx < 0 ? x : startX,
+        y: dy < 0 ? y : startY
+      }
+      const element = this.elementFactory.getActiveElement()!
+      element.update(options)
+      this.render()
     }
-    const element = this.elementFactory.getActiveElement()!
-    element.update(options)
-    this.render()
   }
 
   /**
@@ -134,7 +140,9 @@ export default class Whiteboard {
   onMouseup() {
     this.isMousedown = false
     this.mousedownPoint = { x: 0, y: 0 }
-    this.history.add()
+    if (this.isCreateElement) {
+      this.history.add()
+    }
   }
 
   /**
@@ -145,5 +153,24 @@ export default class Whiteboard {
     this.elementFactory.elementList.forEach((element) => {
       element.render()
     })
+  }
+
+  getStatus(): WhiteboardStatus {
+    return this.status
+  }
+
+  setType(type: string) {
+    this.status.type = type as EventType
+    switch (type) {
+      case EventTypeEnum.Select:
+        this.isCreateElement = false
+        break
+      case EventTypeEnum.Rect:
+        this.isCreateElement = true
+        break
+      default:
+        this.isCreateElement = false
+    }
+    this.emit(EmitEventEnum.StatusChange)
   }
 }

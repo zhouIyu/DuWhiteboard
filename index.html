@@ -7,6 +7,11 @@
     <style>
       button {
         font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      button.active {
+        color: red;
       }
     </style>
   </head>
@@ -14,8 +19,12 @@
     <div id="app">
       <canvas id="canvas" style="border: solid 1px #ddd;"></canvas>
       <div>
-        <button id="undo">undo</button>
-        <button id="redo">redo</button>
+        <button id="undo">撤销</button>
+        <button id="redo">重做</button>
+      </div>
+      <div id="selectBox">
+        <button id="select" data-type="select">选择</button>
+        <button id="rect" data-type="rect">矩形</button>
       </div>
     </div>
     <script type="module">
@@ -28,6 +37,10 @@
 
       const $undo = document.querySelector('#undo')
       const $redo = document.querySelector('#redo')
+      const $selectBox = document.querySelector('#selectBox')
+
+      let currentType = 'select'
+
       setButtonStatus()
 
       whiteboard.on('statusChange', () => {
@@ -35,10 +48,34 @@
       })
 
       function setButtonStatus () {
-        const { canUndo, canRedo } = whiteboard.status
+        const { canUndo, canRedo, type } = whiteboard.getStatus()
         $undo.disabled = !canUndo
         $redo.disabled = !canRedo
+        currentType = type
+        setActiveButton(type)
       }
+
+      function setActiveButton (type) {
+        const $buttons = $selectBox.querySelectorAll('button')
+        $buttons.forEach($button => {
+          if ($button.dataset.type === type) {
+            $button.classList.add('active')
+          } else {
+            $button.classList.remove('active')
+          }
+        })
+      }
+
+      $selectBox.addEventListener('click', e => {
+        const $button = e.target
+        if ($button.tagName === 'BUTTON') {
+          const type = $button.dataset.type
+          if (type === currentType) {
+            return
+          }
+          whiteboard.setType(type)
+        }
+      })
 
       $undo.addEventListener('click', () => {
         whiteboard.history.undo()
