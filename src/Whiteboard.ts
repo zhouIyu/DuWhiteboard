@@ -1,8 +1,8 @@
-import { ElementOptions, ElementType, EventType, Point, WhiteboardOptions, WhiteboardStatus } from '../index'
+import { ElementOptions, ElementType, Point, WhiteboardOptions, WhiteboardStatus } from '../index'
 import ElementFactory from './ElementFactory'
 import History from './History'
 import EventEmitter from 'eventemitter3'
-import { EmitEventEnum, EventTypeEnum } from './enum'
+import { ElementTypeEnum, EmitEventEnum } from './enum'
 
 export default class Whiteboard {
   canvas: HTMLCanvasElement // 画布
@@ -20,7 +20,7 @@ export default class Whiteboard {
 
   status: WhiteboardStatus = {
     // 白板状态
-    type: EventTypeEnum.Select,
+    type: ElementTypeEnum.Select,
     canRedo: false,
     canUndo: false
   }
@@ -82,9 +82,17 @@ export default class Whiteboard {
    * 绑定事件
    */
   bindEvent() {
-    this.canvas.addEventListener('mousedown', this.onMousedown.bind(this))
-    this.canvas.addEventListener('mousemove', this.onMousemove.bind(this))
-    this.canvas.addEventListener('mouseup', this.onMouseup.bind(this))
+    const { canvas } = this
+    canvas.addEventListener('mousedown', this.onMousedown.bind(this))
+    canvas.addEventListener('mousemove', this.onMousemove.bind(this))
+    canvas.addEventListener('mouseup', this.onMouseup.bind(this))
+    canvas.addEventListener('mouseleave', this.onMouseleave.bind(this))
+  }
+
+  onMouseleave() {
+    if (this.isMousedown) {
+      this.onMouseup()
+    }
   }
 
   /**
@@ -95,15 +103,12 @@ export default class Whiteboard {
     const { x, y } = e
     this.isMousedown = true
     this.mousedownPoint = { x, y }
-    if (this.isCreateElement) {
-      // 创建元素
-      this.elementFactory.createElement(this.status.type as ElementType, {
-        x,
-        y,
-        width: 0,
-        height: 0
-      })
-    }
+    this.elementFactory.createElement(this.status.type as ElementType, {
+      x,
+      y,
+      width: 0,
+      height: 0
+    })
   }
 
   /**
@@ -116,22 +121,20 @@ export default class Whiteboard {
     }
     const { x, y } = e
     const { x: startX, y: startY } = this.mousedownPoint
-    if (this.isCreateElement) {
-      const dx = x - startX
-      const dy = y - startY
-      // 更新元素
-      const width = Math.abs(dx)
-      const height = Math.abs(dy)
-      const options: ElementOptions = {
-        width: width,
-        height: height,
-        x: dx < 0 ? x : startX,
-        y: dy < 0 ? y : startY
-      }
-      const element = this.elementFactory.getActiveElement()!
-      element.update(options)
-      this.render()
+    const dx = x - startX
+    const dy = y - startY
+    // 更新元素
+    const width = Math.abs(dx)
+    const height = Math.abs(dy)
+    const options: ElementOptions = {
+      width: width,
+      height: height,
+      x: dx < 0 ? x : startX,
+      y: dy < 0 ? y : startY
     }
+    const element = this.elementFactory.getActiveElement()!
+    element.update(options)
+    this.render()
   }
 
   /**
@@ -142,6 +145,9 @@ export default class Whiteboard {
     this.mousedownPoint = { x: 0, y: 0 }
     if (this.isCreateElement) {
       this.history.add()
+    } else {
+      this.elementFactory.deleteElement(0)
+      this.render()
     }
   }
 
@@ -160,13 +166,13 @@ export default class Whiteboard {
   }
 
   setType(type: string) {
-    this.status.type = type as EventType
+    this.status.type = type as ElementTypeEnum
     let cursor = 'default'
     switch (type) {
-      case EventTypeEnum.Select:
+      case ElementTypeEnum.Select:
         this.isCreateElement = false
         break
-      case EventTypeEnum.Rect:
+      case ElementTypeEnum.Rect:
         this.isCreateElement = true
         cursor = 'crosshair'
         break

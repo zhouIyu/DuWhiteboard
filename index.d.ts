@@ -1,4 +1,4 @@
-export type ElementType = | 'base' | 'rect'
+export type ElementType = | 'base' | 'rect' | 'select'
 
 export type Point = {
   x: number
@@ -20,10 +20,8 @@ export type WhiteboardOptions = {
   height?: number
 }
 
-export type EventType = ElementType | 'select'
-
 export type WhiteboardStatus = {
-  type: EventType
+  type: ElementType
   canRedo: boolean
   canUndo: boolean
 }

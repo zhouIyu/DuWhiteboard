@@ -1,6 +1,7 @@
 import { BaseElement, ElementOptions, Whiteboard, ElementType, ElementObject } from '../index'
 import { ElementTypeEnum } from './enum'
-import { Rect } from './element'
+import Rect from './element/Rect'
+import Selection from './element/Selection'
 
 export default class ElementFactory {
   elementList: BaseElement[] = [] // 元素列表
@@ -21,6 +22,9 @@ export default class ElementFactory {
     switch (type) {
       case ElementTypeEnum.Rect:
         element = new Rect(this.app, options)
+        break
+      case ElementTypeEnum.Select:
+        element = new Selection(this.app, options)
         break
       default:
         throw new Error('type is not supported')
@@ -61,6 +65,11 @@ export default class ElementFactory {
     const index = this.elementList.findIndex((item) => item.id === id)
     if (index > -1) {
       this.elementList.splice(index, 1)
+    }
+    const len = this.elementList.length
+    if (len > 0) {
+      const lastElement: BaseElement = this.elementList[len - 1]
+      this.setActiveElement(lastElement)
     }
   }
 }

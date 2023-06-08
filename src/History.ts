@@ -14,6 +14,8 @@ export default class History {
    * 设置状态
    */
   setStatus() {
+    console.log('redo', this.redoList)
+    console.log('undo', this.undoList)
     this.app.status.canUndo = this.canUndo()
     this.app.status.canRedo = this.canRedo()
     this.app.emit(EmitEventEnum.StatusChange)
