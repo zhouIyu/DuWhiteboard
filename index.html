@@ -2,13 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    <style>
+      button {
+        font-size: 18px;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
       <canvas id="canvas" style="border: solid 1px #ddd;"></canvas>
+      <div>
+        <button id="undo">undo</button>
+        <button id="redo">redo</button>
+      </div>
     </div>
     <script type="module">
       import Whiteboard from '/src/Whiteboard.ts'
@@ -16,6 +24,28 @@
       const whiteboard = new Whiteboard('#canvas', {
         width: 600,
         height: 400
+      })
+
+      const $undo = document.querySelector('#undo')
+      const $redo = document.querySelector('#redo')
+      setButtonStatus()
+
+      whiteboard.on('statusChange', () => {
+        setButtonStatus()
+      })
+
+      function setButtonStatus () {
+        const { canUndo, canRedo } = whiteboard.status
+        $undo.disabled = !canUndo
+        $redo.disabled = !canRedo
+      }
+
+      $undo.addEventListener('click', () => {
+        whiteboard.history.undo()
+      })
+
+      $redo.addEventListener('click', () => {
+        whiteboard.history.redo()
       })
     </script>
   </body>

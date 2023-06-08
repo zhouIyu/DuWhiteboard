@@ -1,6 +1,14 @@
+import EventEmitter from 'eventemitter3'
+
 export type WhiteboardOptions = {
   width?: number
   height?: number
+}
+
+export type WhiteboardStatus = {
+  type: string
+  canRedo: boolean
+  canUndo: boolean
 }
 
 export interface Whiteboard {
@@ -9,11 +17,29 @@ export interface Whiteboard {
   width: number
   height: number
   isMousedown: boolean
+  mousedownPoint: Point
+  elementFactory: ElementFactory
+  history: History
+  status: WhiteboardStatus
+
+  on: Function
+  emit: Function
+  off: Function
 
   initCanvas (): void
+
+  bindEvent (): void
+
+  onMousedown (e: MouseEvent): void
+
+  onMousemove (e: MouseEvent): void
+
+  onMouseup (e: MouseEvent): void
+
+  render (): void
 }
 
-export type ElementType = 'rect'
+export type ElementType = | 'base' | 'rect'
 
 export type Point = {
   x: number
@@ -25,9 +51,13 @@ export type ElementOptions = {
   y: number
   width: number
   height: number
+  id?: number
 }
 
+export type ElementObject = ElementOptions & { type: ElementType, id: number }
+
 export interface BaseElement {
+  id: number
   type: string
   x: number
   y: number
@@ -38,6 +68,8 @@ export interface BaseElement {
   render (): void
 
   update (options: ElementOptions): void
+
+  getOptions (): ElementObject
 }
 
 export interface ElementFactory {
@@ -50,5 +82,25 @@ export interface ElementFactory {
   setActiveElement (element: BaseElement): void
 
   getActiveElement (): BaseElement | null
+
+  getActiveElementOptions (): ElementObject | null
+
+  deleteElement (id: number): void
+}
+
+export interface History {
+  app: Whiteboard
+  redoList: ElementObject[]
+  undoList: T[]
+
+  add (): void
+
+  redo (): void
+
+  undo (): void
+
+  isUndo (): boolean
+
+  isRedo (): boolean
 }
 
