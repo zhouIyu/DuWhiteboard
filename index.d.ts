@@ -59,6 +59,8 @@ export interface Whiteboard {
   getStatus (): WhiteboardStatus
 
   setType (type: EventType): void
+
+  setCursor (cursor: string): void
 }
 
 export interface BaseElement {

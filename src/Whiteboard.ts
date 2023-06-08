@@ -161,16 +161,23 @@ export default class Whiteboard {
 
   setType(type: string) {
     this.status.type = type as EventType
+    let cursor = 'default'
     switch (type) {
       case EventTypeEnum.Select:
         this.isCreateElement = false
         break
       case EventTypeEnum.Rect:
         this.isCreateElement = true
+        cursor = 'crosshair'
         break
       default:
         this.isCreateElement = false
     }
+    this.setCursor(cursor)
     this.emit(EmitEventEnum.StatusChange)
+  }
+
+  setCursor(cursor: string) {
+    this.canvas.style.cursor = cursor
   }
 }
