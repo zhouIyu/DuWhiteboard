@@ -3,7 +3,7 @@ import ElementFactory from './ElementFactory'
 import History from './History'
 import EventEmitter from 'eventemitter3'
 import { ElementTypeEnum, EmitEventEnum } from './enum'
-import SelectController from './SelectController'
+import ControllerContainer from './controller/Container'
 
 export default class Whiteboard {
   canvas: HTMLCanvasElement // 画布
@@ -28,7 +28,7 @@ export default class Whiteboard {
 
   elementFactory: ElementFactory
   history: History
-  selectController: SelectController
+  controllerContainer: ControllerContainer
 
   on: Function
   emit: Function
@@ -67,7 +67,7 @@ export default class Whiteboard {
     // 加载模块
     this.elementFactory = new ElementFactory(this)
     this.history = new History(this)
-    this.selectController = new SelectController(this)
+    this.controllerContainer = new ControllerContainer(this)
 
     // 绑定事件
     this.bindEvent()

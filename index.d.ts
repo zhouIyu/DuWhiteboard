@@ -36,7 +36,7 @@ export interface Whiteboard {
   mousedownPoint: Point
   elementFactory: ElementFactory
   history: History
-  selectController: SelectController
+  controllerContainer: ControllerContainer
   status: WhiteboardStatus
 
   on: Function
@@ -68,7 +68,7 @@ export interface BaseElement {
   app: Whiteboard
   id: number
   type: ElementType
-  start: Point
+  start: ElementOptions
   x: number
   y: number
   width: number
@@ -86,6 +86,8 @@ export interface BaseElement {
   move (x: number, y: number): void
 
   changeSize (width: number, height: number): void
+
+  onUpdateComplete (id: number): void
 }
 
 export interface ElementFactory {
@@ -126,7 +128,7 @@ export interface History {
   canRedo (): boolean
 }
 
-export interface SelectController {
+export interface ControllerContainer {
   app: Whiteboard
   isMousedown: boolean
   mousedownPoint: Point

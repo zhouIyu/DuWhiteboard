@@ -78,9 +78,11 @@ export default class ElementFactory {
   }
 
   selectionElement() {
-    const element = this.getActiveElement()! as Selection
-    element.deleteSelection()
-    this.deleteElement(element.id)
+    const element = this.getActiveElement()
+    if (element?.type === ElementTypeEnum.Select) {
+      ;(<Selection>element).deleteSelection()
+      this.deleteElement(element.id)
+    }
   }
 
   cancelSelection() {

@@ -1,9 +1,10 @@
-import { ElementObject, ElementOptions, ElementType, Point, Whiteboard } from '../../index'
+import { ElementObject, ElementOptions, ElementType, Whiteboard } from '../../index'
+import { ElementEventEnum } from '../enum'
 
 export default class BaseElement {
   app: Whiteboard
   type: ElementType // 元素类型
-  start: Point = { x: 0, y: 0 } // 元素起始位置
+  start: ElementOptions = { x: 0, y: 0, width: 0, height: 0 } // 元素起始位置
   // 元素位置 左上角坐标
   x: number = 0
   y: number = 0
@@ -19,13 +20,17 @@ export default class BaseElement {
     this.app = app
     this.start = {
       x: options.x,
-      y: options.y
+      y: options.y,
+      width: options.width,
+      height: options.height
     }
     this.x = options.x || this.x
     this.y = options.y || this.y
     this.width = options.width || this.width
     this.height = options.height || this.height
     this.id = options.id || Date.now()
+
+    this.app.on(ElementEventEnum.ElementUpdateComplete, this.onUpdateComplete.bind(this))
   }
 
   render() {
@@ -51,6 +56,17 @@ export default class BaseElement {
     this.height = height
   }
 
+  onUpdateComplete(id: number) {
+    if (id === this.id) {
+      this.start = {
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height
+      }
+    }
+  }
+
   /**
    * 获取元素选项
    */
@@ -69,11 +85,13 @@ export default class BaseElement {
     if (isSelected && !this.isSelected) {
       this.start = {
         x: this.x,
-        y: this.y
+        y: this.y,
+        width: this.width,
+        height: this.height
       }
-      this.app.selectController.create(this.getOptions())
+      this.app.controllerContainer.create(this.getOptions())
     } else if (!isSelected && this.isSelected) {
-      this.app.selectController.remove(this.id)
+      this.app.controllerContainer.remove(this.id)
     }
     this.isSelected = isSelected
   }

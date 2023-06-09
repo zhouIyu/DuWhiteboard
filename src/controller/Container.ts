@@ -1,6 +1,8 @@
-import { ElementOptions, Point, Whiteboard } from '../index'
+import { ElementOptions, Point, Whiteboard } from '../../index'
+import ControllerCircle from './Circle'
+import { DirectionEnum } from '../enum'
 
-export default class SelectController {
+export default class Container {
   app: Whiteboard
   mousedownPoint: Point = {
     x: 0,
@@ -12,6 +14,7 @@ export default class SelectController {
   borderColor: string = 'rgba(121, 181, 254,0.8)'
   className: string = 'du-whiteboard__selection'
   idPrefix: string = 'whiteboard-selection-'
+  elementId: number = 0
 
   constructor(app: Whiteboard) {
     this.app = app
@@ -19,7 +22,6 @@ export default class SelectController {
 
   create(options: ElementOptions) {
     const { x, y, width, height, id } = options
-    console.log(x, y)
     const canvas = this.app.canvas
     const canvasOffsetLeft = canvas.offsetLeft
     const canvasOffsetTop = canvas.offsetTop
@@ -37,14 +39,19 @@ export default class SelectController {
     $selection.style.backgroundColor = 'rgba(114, 211, 242,0.1)'
     $selection.style.zIndex = '100'
     document.body.appendChild($selection)
+    const list = [DirectionEnum.BottomLeft, DirectionEnum.BottomRight, DirectionEnum.TopLeft, DirectionEnum.TopRight]
+
+    list.forEach((type) => {
+      new ControllerCircle(this.app, type, $selection)
+    })
     this.bindEvent($selection)
   }
 
   bindEvent(ele: HTMLDivElement) {
-    ele.addEventListener('mousedown', this.onMousedown.bind(this))
-    ele.addEventListener('mousemove', this.onMousemove.bind(this))
-    ele.addEventListener('mouseup', this.onMouseup.bind(this))
-    ele.addEventListener('mouseleave', this.onMouseleave.bind(this))
+    ele.addEventListener('mousedown', this.onMousedown.bind(this), false)
+    ele.addEventListener('mousemove', this.onMousemove.bind(this), false)
+    ele.addEventListener('mouseup', this.onMouseup.bind(this), false)
+    ele.addEventListener('mouseleave', this.onMouseleave.bind(this), false)
   }
 
   offEvent(ele: HTMLDivElement) {
@@ -63,11 +70,13 @@ export default class SelectController {
   }
 
   onMousedown(e: MouseEvent) {
+    if (e.target !== e.currentTarget) return
     this.isMousedown = true
     this.mousedownPoint = {
       x: e.clientX,
       y: e.clientY
     }
+    this.elementId = parseInt((e.target as HTMLDivElement).id.split('-')[2])
   }
 
   onMousemove(e: MouseEvent) {
@@ -79,8 +88,7 @@ export default class SelectController {
     let dy = clientY - startY
     const target = e.target as HTMLDivElement
 
-    const id = parseInt(target.id.split('-')[2])
-    const element = this.app.elementFactory.getElement(id)
+    const element = this.app.elementFactory.getElement(this.elementId)
 
     const canvasOffsetLeft = this.app.canvas.offsetLeft
     const canvasOffsetTop = this.app.canvas.offsetTop
@@ -111,17 +119,22 @@ export default class SelectController {
     this.app.render()
   }
 
-  onMouseup() {
+  onMouseup(e: MouseEvent) {
+    if (e.target !== e.currentTarget) return
     this.isMousedown = false
     this.mousedownPoint = {
       x: 0,
       y: 0
     }
+    if (this.elementId === 0) return
+    const element = this.app.elementFactory.getElement(this.elementId)
+    element.onUpdateComplete(this.elementId)
   }
 
-  onMouseleave() {
+  onMouseleave(e: MouseEvent) {
+    if (e.target !== e.currentTarget) return
     if (this.isMousedown) {
-      this.onMouseup()
+      this.onMouseup(e)
     }
   }
 }
