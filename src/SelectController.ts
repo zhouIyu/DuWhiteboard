@@ -6,7 +6,7 @@ export default class SelectController {
     x: 0,
     y: 0
   }
-  isMouseDown: boolean = false
+  isMousedown: boolean = false
   padding: number = 5
   borderWidth: number = 2
   borderColor: string = 'rgba(121, 181, 254,0.8)'
@@ -41,16 +41,17 @@ export default class SelectController {
   }
 
   bindEvent(ele: HTMLDivElement) {
-    ele.addEventListener('mousedown', this.onMouseDown.bind(this))
-    ele.addEventListener('mousemove', this.onMouseMove.bind(this))
-    ele.addEventListener('mouseup', this.onMouseUp.bind(this))
-    ele.addEventListener('mouseleave', this.onMouseLeave.bind(this))
+    ele.addEventListener('mousedown', this.onMousedown.bind(this))
+    ele.addEventListener('mousemove', this.onMousemove.bind(this))
+    ele.addEventListener('mouseup', this.onMouseup.bind(this))
+    ele.addEventListener('mouseleave', this.onMouseleave.bind(this))
   }
 
   offEvent(ele: HTMLDivElement) {
-    ele.removeEventListener('mousedown', this.onMouseDown.bind(this))
-    ele.removeEventListener('mousemove', this.onMouseMove.bind(this))
-    ele.removeEventListener('mouseup', this.onMouseUp.bind(this))
+    ele.removeEventListener('mousedown', this.onMousedown.bind(this))
+    ele.removeEventListener('mousemove', this.onMousemove.bind(this))
+    ele.removeEventListener('mouseup', this.onMouseup.bind(this))
+    ele.removeEventListener('mouseleave', this.onMouseleave.bind(this))
   }
 
   remove(id: number) {
@@ -61,16 +62,16 @@ export default class SelectController {
     }
   }
 
-  onMouseDown(e: MouseEvent) {
-    this.isMouseDown = true
+  onMousedown(e: MouseEvent) {
+    this.isMousedown = true
     this.mousedownPoint = {
       x: e.clientX,
       y: e.clientY
     }
   }
 
-  onMouseMove(e: MouseEvent) {
-    if (!this.isMouseDown) return
+  onMousemove(e: MouseEvent) {
+    if (!this.isMousedown) return
 
     const { clientX, clientY } = e
     const { x: startX, y: startY } = this.mousedownPoint
@@ -110,17 +111,17 @@ export default class SelectController {
     this.app.render()
   }
 
-  onMouseUp() {
-    this.isMouseDown = false
+  onMouseup() {
+    this.isMousedown = false
     this.mousedownPoint = {
       x: 0,
       y: 0
     }
   }
 
-  onMouseLeave() {
-    if (this.isMouseDown) {
-      this.onMouseUp()
+  onMouseleave() {
+    if (this.isMousedown) {
+      this.onMouseup()
     }
   }
 }

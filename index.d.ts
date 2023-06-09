@@ -128,9 +128,9 @@ export interface History {
 
 export interface SelectController {
   app: Whiteboard
-  padding: number
   isMousedown: boolean
   mousedownPoint: Point
+  padding: number
   borderWidth: number
   borderColor: string
   className: string
