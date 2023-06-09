@@ -130,28 +130,10 @@ export interface History {
 
 export interface ControllerContainer {
   app: Whiteboard
-  isMousedown: boolean
-  mousedownPoint: Point
-  padding: number
-  borderWidth: number
-  borderColor: string
-  className: string
-  idPrefix: string
+  rectList: any[]
 
-  create (options: ElementOptions): void
+  create (options: ElementObject): void
 
   remove (id: number): void
-
-  bindEvent (ele: HTMLDivElement): void
-
-  offEvent (ele: HTMLDivElement): void
-
-  onMousedown (e: MouseEvent): void
-
-  onMousemove (e: MouseEvent): void
-
-  onMouseup (): void
-
-  onMouseleave (): void
 }
 

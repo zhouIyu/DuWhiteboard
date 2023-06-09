@@ -18,6 +18,7 @@ export default class ControllerCircle extends DragElement {
   id: number = 0
 
   constructor(app: Whiteboard, type: DirectionEnum, parent: HTMLDivElement) {
+    super()
     this.app = app
     this.type = type
     this.parent = parent
