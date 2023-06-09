@@ -1,8 +1,9 @@
-import { ElementObject, ElementOptions, ElementType, Whiteboard } from '../../index'
+import { ElementObject, ElementOptions, ElementType, Point, Whiteboard } from '../../index'
 
 export default class BaseElement {
   app: Whiteboard
   type: ElementType // 元素类型
+  start: Point = { x: 0, y: 0 } // 元素起始位置
   // 元素位置 左上角坐标
   x: number = 0
   y: number = 0
@@ -11,10 +12,15 @@ export default class BaseElement {
   height: number = 0
   // 元素id
   readonly id: number
+  isSelected: boolean = false
 
   constructor(app: Whiteboard, options: ElementOptions) {
     this.type = 'base'
     this.app = app
+    this.start = {
+      x: options.x,
+      y: options.y
+    }
     this.x = options.x || this.x
     this.y = options.y || this.y
     this.width = options.width || this.width
@@ -31,10 +37,18 @@ export default class BaseElement {
    * @param options
    */
   update(options: ElementOptions) {
-    this.x = options.x
-    this.y = options.y
-    this.width = options.width
-    this.height = options.height
+    this.move(options.x, options.y)
+    this.changeSize(options.width, options.height)
+  }
+
+  move(x: number, y: number) {
+    this.x = x
+    this.y = y
+  }
+
+  changeSize(width: number, height: number) {
+    this.width = width
+    this.height = height
   }
 
   /**
@@ -49,5 +63,18 @@ export default class BaseElement {
       id: this.id,
       type: this.type
     }
+  }
+
+  setSelected(isSelected: boolean) {
+    if (isSelected && !this.isSelected) {
+      this.start = {
+        x: this.x,
+        y: this.y
+      }
+      this.app.selectController.create(this.getOptions())
+    } else if (!isSelected && this.isSelected) {
+      this.app.selectController.remove(this.id)
+    }
+    this.isSelected = isSelected
   }
 }

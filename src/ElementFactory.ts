@@ -72,4 +72,20 @@ export default class ElementFactory {
       this.setActiveElement(lastElement)
     }
   }
+
+  getElement(id: number) {
+    return this.elementList.find((item) => item.id === id)!
+  }
+
+  selectionElement() {
+    const element = this.getActiveElement()! as Selection
+    element.deleteSelection()
+    this.deleteElement(element.id)
+  }
+
+  cancelSelection() {
+    this.elementList.forEach((item) => {
+      item.setSelected(false)
+    })
+  }
 }

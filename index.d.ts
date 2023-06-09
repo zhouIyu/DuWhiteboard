@@ -36,6 +36,7 @@ export interface Whiteboard {
   mousedownPoint: Point
   elementFactory: ElementFactory
   history: History
+  selectController: SelectController
   status: WhiteboardStatus
 
   on: Function
@@ -50,7 +51,9 @@ export interface Whiteboard {
 
   onMousemove (e: MouseEvent): void
 
-  onMouseup (e: MouseEvent): void
+  onMouseup (): void
+
+  onMouseleave (): void
 
   render (): void
 
@@ -62,19 +65,27 @@ export interface Whiteboard {
 }
 
 export interface BaseElement {
+  app: Whiteboard
   id: number
   type: ElementType
+  start: Point
   x: number
   y: number
   width: number
   height: number
-  app: Whiteboard
+  isSelected: boolean
 
   render (): void
 
   update (options: ElementOptions): void
 
   getOptions (): ElementObject
+
+  setSelected (isSelected: boolean): void
+
+  move (x: number, y: number): void
+
+  changeSize (width: number, height: number): void
 }
 
 export interface ElementFactory {
@@ -91,6 +102,12 @@ export interface ElementFactory {
   getActiveElementOptions (): ElementObject | null
 
   deleteElement (id: number): void
+
+  getElement (id: number): BaseElement
+
+  cancelSelection (): void
+
+  selectionElement (): void
 }
 
 export interface History {
@@ -107,5 +124,32 @@ export interface History {
   canUndo (): boolean
 
   canRedo (): boolean
+}
+
+export interface SelectController {
+  app: Whiteboard
+  padding: number
+  isMousedown: boolean
+  mousedownPoint: Point
+  borderWidth: number
+  borderColor: string
+  className: string
+  idPrefix: string
+
+  create (options: ElementOptions): void
+
+  remove (id: number): void
+
+  bindEvent (ele: HTMLDivElement): void
+
+  offEvent (ele: HTMLDivElement): void
+
+  onMousedown (e: MouseEvent): void
+
+  onMousemove (e: MouseEvent): void
+
+  onMouseup (): void
+
+  onMouseleave (): void
 }
 

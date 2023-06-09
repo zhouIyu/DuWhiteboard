@@ -20,4 +20,18 @@ export default class Selection extends BaseElement {
     ctx.fill()
     ctx.restore()
   }
+
+  deleteSelection() {
+    const { x, y, width, height } = this
+    const endX = x + width
+    const endY = y + height
+    this.app.elementFactory.elementList.forEach((element) => {
+      if (element.type === 'select') return
+      if (element.x >= x && element.y >= y && element.x + element.width <= endX && element.y + element.height <= endY) {
+        element.setSelected(true)
+      } else {
+        element.setSelected(false)
+      }
+    })
+  }
 }

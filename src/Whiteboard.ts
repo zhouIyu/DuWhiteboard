@@ -3,6 +3,7 @@ import ElementFactory from './ElementFactory'
 import History from './History'
 import EventEmitter from 'eventemitter3'
 import { ElementTypeEnum, EmitEventEnum } from './enum'
+import SelectController from './SelectController'
 
 export default class Whiteboard {
   canvas: HTMLCanvasElement // 画布
@@ -27,6 +28,7 @@ export default class Whiteboard {
 
   elementFactory: ElementFactory
   history: History
+  selectController: SelectController
 
   on: Function
   emit: Function
@@ -65,6 +67,7 @@ export default class Whiteboard {
     // 加载模块
     this.elementFactory = new ElementFactory(this)
     this.history = new History(this)
+    this.selectController = new SelectController(this)
 
     // 绑定事件
     this.bindEvent()
@@ -103,6 +106,7 @@ export default class Whiteboard {
     const { x, y } = e
     this.isMousedown = true
     this.mousedownPoint = { x, y }
+    this.elementFactory.cancelSelection()
     this.elementFactory.createElement(this.status.type as ElementType, {
       x,
       y,
@@ -146,7 +150,7 @@ export default class Whiteboard {
     if (this.isCreateElement) {
       this.history.add()
     } else {
-      this.elementFactory.deleteElement(0)
+      this.elementFactory.selectionElement()
       this.render()
     }
   }
