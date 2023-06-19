@@ -1,15 +1,15 @@
 import { BaseElement, ElementOptions, Whiteboard, ElementType, ElementObject } from '../index'
-import { ElementTypeEnum } from './enum'
+import { ElementEventEnum, ElementTypeEnum } from './enum'
 import Rect from './element/Rect'
-import Selection from './element/Selection'
 
-export default class ElementFactory {
+export default class Factory {
   elementList: BaseElement[] = [] // 元素列表
   activeElement: BaseElement | null = null // 当前激活元素
   app: Whiteboard
 
   constructor(app: Whiteboard) {
     this.app = app
+    this.app.on(ElementEventEnum.Selected, this.onSelected.bind(this))
   }
 
   /**
@@ -22,9 +22,6 @@ export default class ElementFactory {
     switch (type) {
       case ElementTypeEnum.Rect:
         element = new Rect(this.app, options)
-        break
-      case ElementTypeEnum.Select:
-        element = new Selection(this.app, options)
         break
       default:
         throw new Error('type is not supported')
@@ -57,6 +54,11 @@ export default class ElementFactory {
     return element.getOptions()
   }
 
+  updateActiveElement(options: ElementOptions) {
+    const element = this.getActiveElement()!
+    element.update(options)
+  }
+
   /**
    * 删除元素
    * @param id
@@ -73,21 +75,20 @@ export default class ElementFactory {
     }
   }
 
-  getElement(id: number) {
-    return this.elementList.find((item) => item.id === id)!
+  render() {
+    this.elementList.forEach((item) => item.render())
   }
 
-  selectionElement() {
-    const element = this.getActiveElement()
-    if (element?.type === ElementTypeEnum.Select) {
-      ;(<Selection>element).deleteSelection()
-      this.deleteElement(element.id)
-    }
-  }
-
-  cancelSelection() {
-    this.elementList.forEach((item) => {
-      item.setSelected(false)
+  onSelected(options: ElementOptions) {
+    const { x, y, width, height } = options
+    const endX = x + width
+    const endY = y + height
+    this.elementList.forEach((element) => {
+      if (element.x >= x && element.y >= y && element.x + element.width <= endX && element.y + element.height <= endY) {
+        element.setSelected(true)
+      } else {
+        element.setSelected(false)
+      }
     })
   }
 }

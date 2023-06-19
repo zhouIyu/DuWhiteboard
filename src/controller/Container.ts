@@ -1,6 +1,6 @@
 import { ElementOptions, Whiteboard } from '../../index'
-import ControllerRect from './Rect'
-import ControllerCircle from './Circle'
+import Box from './Box'
+import Direction from './Direction'
 import { DirectionEnum } from '../enum'
 
 export default class Container {
@@ -8,27 +8,27 @@ export default class Container {
   options: ElementOptions
   idPrefix: string = 'whiteboard-selection-'
   ele: HTMLElement
-  rect: ControllerRect
-  circleList: ControllerCircle[] = []
+  box: Box
+  circleList: Direction[] = []
 
   constructor(app: Whiteboard, options: ElementOptions) {
     this.app = app
     this.options = options
     this.ele = this.create()
-    this.rect = this.createRect()
-    this.createCircle()
+    this.box = this.createBox()
+    this.createDirection()
   }
 
-  createRect() {
-    const rect = new ControllerRect(this.app, this.options)
+  createBox() {
+    const rect = new Box(this.app, this.options)
     this.ele.appendChild(rect.ele)
     return rect
   }
 
-  createCircle() {
+  createDirection() {
     const list = [DirectionEnum.BottomRight]
     list.forEach((type) => {
-      const circle = new ControllerCircle(this.app, this.options, type)
+      const circle = new Direction(this.app, this.options, type)
       this.ele.appendChild(circle.ele)
       this.circleList.push(circle)
     })
@@ -42,7 +42,7 @@ export default class Container {
   }
 
   remove() {
-    this.rect.remove()
+    this.box.remove()
     this.circleList.forEach((item) => item.remove())
     document.body.removeChild(this.ele)
   }

@@ -2,9 +2,9 @@ import { ElementOptions, UpdateElementOptions, Whiteboard } from '../../index'
 import { DirectionEnum, ElementEventEnum } from '../enum'
 import DragElement from './DragElement'
 
-export default class ControllerCircle extends DragElement {
+export default class Direction extends DragElement {
   type: DirectionEnum
-  className: string = 'du-whiteboard__selection-circle'
+  className: string = 'du-whiteboard__selection-direction'
   radius: number = 8
 
   constructor(app: Whiteboard, options: ElementOptions, type: DirectionEnum) {

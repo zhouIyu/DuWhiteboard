@@ -1,6 +1,6 @@
 export type ElementType = | 'base' | 'rect' | 'select'
 
-export type UpdateType = | 'rect' | 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+export type UpdateType = | 'box' | 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
 
 export type Point = {
   x: number
@@ -36,9 +36,10 @@ export interface Whiteboard {
   isMousedown: boolean
   isCreateElement: boolean
   mousedownPoint: Point
-  elementFactory: ElementFactory
+  factory: Factory
   history: History
   controller: Controller
+  selection: Selection
   status: WhiteboardStatus
 
   on: Function
@@ -88,10 +89,10 @@ export interface BaseElement {
 
   changeSize (width: number, height: number): void
 
-  onUpdateComplete (id: number): void
+  onUpdate (options: UpdateElementOptions): void
 }
 
-export interface ElementFactory {
+export interface Factory {
   elementList: BaseElement[]
   activeElement: BaseElement | null
   app: Whiteboard
@@ -104,13 +105,13 @@ export interface ElementFactory {
 
   getActiveElementOptions (): ElementObject | null
 
+  updateActiveElement (options: ElementOptions): void
+
   deleteElement (id: number): void
 
-  getElement (id: number): BaseElement
+  render (): void
 
-  cancelSelection (): void
-
-  selectionElement (): void
+  onSelected (options: ElementOptions): void
 }
 
 export interface History {
@@ -136,6 +137,24 @@ export interface Controller {
   create (options: ElementObject): void
 
   remove (id: number): void
+}
+
+export interface Selection {
+  app: Whiteboard
+  x: number
+  y: number
+  width: number
+  height: number
+
+  render (): void
+
+  create (options: ElementOptions): void
+
+  update (options: ElementOptions): void
+
+  selected (): void
+
+  remove (): void
 }
 
 export type UpdateElementOptions = {

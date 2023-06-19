@@ -25,7 +25,7 @@ export default class History {
    * 添加元素
    */
   add() {
-    const element = this.app.elementFactory.getActiveElementOptions()!
+    const element = this.app.factory.getActiveElementOptions()!
     this.undoList.push(element)
     this.setStatus()
   }
@@ -39,7 +39,7 @@ export default class History {
     }
     const item = this.redoList.pop()!
     this.undoList.push(item)
-    this.app.elementFactory.createElement(item.type, item)
+    this.app.factory.createElement(item.type, item)
     this.app.render()
     this.setStatus()
   }
@@ -53,7 +53,7 @@ export default class History {
     }
     const item = this.undoList.pop()!
     this.redoList.push(item)
-    this.app.elementFactory.deleteElement(item.id)
+    this.app.factory.deleteElement(item.id)
     this.app.render()
     this.setStatus()
   }

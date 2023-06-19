@@ -1,9 +1,10 @@
 import { ElementOptions, ElementType, Point, WhiteboardOptions, WhiteboardStatus } from '../index'
-import ElementFactory from './ElementFactory'
+import Factory from './Factory'
 import History from './History'
 import EventEmitter from 'eventemitter3'
 import { ElementTypeEnum, EmitEventEnum } from './enum'
 import Controller from './controller'
+import Selection from './Selection'
 
 export default class Whiteboard {
   canvas: HTMLCanvasElement // 画布
@@ -26,9 +27,10 @@ export default class Whiteboard {
     canUndo: false
   }
 
-  elementFactory: ElementFactory
+  factory: Factory
   history: History
   controller: Controller
+  selection: Selection
 
   on: Function
   emit: Function
@@ -65,9 +67,10 @@ export default class Whiteboard {
     this.initCanvas()
 
     // 加载模块
-    this.elementFactory = new ElementFactory(this)
+    this.factory = new Factory(this)
     this.history = new History(this)
     this.controller = new Controller(this)
+    this.selection = new Selection(this)
 
     // 绑定事件
     this.bindEvent()
@@ -106,13 +109,17 @@ export default class Whiteboard {
     const { x, y } = e
     this.isMousedown = true
     this.mousedownPoint = { x, y }
-    this.elementFactory.cancelSelection()
-    this.elementFactory.createElement(this.status.type as ElementType, {
+    const options: ElementOptions = {
       x,
       y,
       width: 0,
       height: 0
-    })
+    }
+    if (this.status.type === ElementTypeEnum.Select) {
+      this.selection.create(options)
+    } else {
+      this.factory.createElement(this.status.type as ElementType, options)
+    }
   }
 
   /**
@@ -136,8 +143,12 @@ export default class Whiteboard {
       x: dx < 0 ? x : startX,
       y: dy < 0 ? y : startY
     }
-    const element = this.elementFactory.getActiveElement()!
-    element.update(options)
+
+    if (this.status.type === ElementTypeEnum.Select) {
+      this.selection.update(options)
+    } else {
+      this.factory.updateActiveElement(options)
+    }
     this.render()
   }
 
@@ -150,7 +161,7 @@ export default class Whiteboard {
     if (this.isCreateElement) {
       this.history.add()
     } else {
-      this.elementFactory.selectionElement()
+      this.selection.selected()
       this.render()
     }
   }
@@ -160,9 +171,10 @@ export default class Whiteboard {
    */
   render() {
     this.ctx.clearRect(0, 0, this.width, this.height)
-    this.elementFactory.elementList.forEach((element) => {
-      element.render()
-    })
+    this.factory.render()
+    if (this.status.type === ElementTypeEnum.Select) {
+      this.selection.render()
+    }
   }
 
   getStatus(): WhiteboardStatus {

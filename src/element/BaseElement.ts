@@ -27,7 +27,6 @@ export default class BaseElement {
   }
 
   onUpdate(options: UpdateElementOptions) {
-    console.log(options)
     if (options.id === this.id) {
       const x = options.dx + this.x
       const y = options.dy + this.y

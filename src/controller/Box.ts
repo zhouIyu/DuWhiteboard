@@ -2,12 +2,12 @@ import DragElement from './DragElement'
 import { ElementOptions, UpdateElementOptions, Whiteboard } from '../../index'
 import { ElementEventEnum } from '../enum'
 
-export default class ControllerRect extends DragElement {
+export default class Box extends DragElement {
   borderWidth: number = 2
   borderColor: string = 'rgba(121, 181, 254,0.8)'
   className: string = 'du-whiteboard__selection'
-  idPrefix: string = 'whiteboard-selection-re'
-  type: string = 'rect'
+  idPrefix: string = 'whiteboard-selection-box'
+  type: string = 'box'
 
   constructor(app: Whiteboard, options: ElementOptions) {
     super(app, options)
