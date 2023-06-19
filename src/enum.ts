@@ -5,8 +5,8 @@ export enum ElementTypeEnum {
 }
 
 export enum ElementEventEnum {
-  ElementUpdate = 'elementUpdate',
-  ElementUpdateComplete = 'elementUpdateComplete'
+  Update = 'update',
+  UpdateComplete = 'updateComplete'
 }
 
 // emit事件类型

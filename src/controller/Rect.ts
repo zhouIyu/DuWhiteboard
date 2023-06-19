@@ -1,19 +1,30 @@
 import DragElement from './DragElement'
-import { ElementObject, ElementOptions, Whiteboard } from '../../index'
+import { ElementOptions, UpdateElementOptions, Whiteboard } from '../../index'
+import { ElementEventEnum } from '../enum'
 
 export default class ControllerRect extends DragElement {
-  options: ElementOptions
-  padding: number = 5
   borderWidth: number = 2
   borderColor: string = 'rgba(121, 181, 254,0.8)'
   className: string = 'du-whiteboard__selection'
-  idPrefix: string = 'whiteboard-selection-'
+  idPrefix: string = 'whiteboard-selection-re'
+  type: string = 'rect'
 
-  constructor(app: Whiteboard, options: ElementObject) {
-    super(app)
+  constructor(app: Whiteboard, options: ElementOptions) {
+    super(app, options)
     this.options = options
     this.ele = this.create()
     this.bindEvent()
+  }
+
+  handleUpdate(options: UpdateElementOptions) {
+    const left = parseInt(this.ele.style.left) + options.dx
+    const top = parseInt(this.ele.style.top) + options.dy
+    const height = parseInt(this.ele.style.height) + options.dh
+    const width = parseInt(this.ele.style.width) + options.dw
+    this.ele.style.left = `${left}px`
+    this.ele.style.top = `${top}px`
+    this.ele.style.width = `${width}px`
+    this.ele.style.height = `${height}px`
   }
 
   create(): HTMLElement {
@@ -34,15 +45,20 @@ export default class ControllerRect extends DragElement {
     $selection.style.cursor = 'move'
     $selection.style.backgroundColor = 'rgba(114, 211, 242,0.1)'
     $selection.style.zIndex = '100'
-    document.body.appendChild($selection)
     return $selection
   }
 
-  onMousemove(e: MouseEvent) {
-    super.onMousemove(e)
+  handleMove() {
+    if (!this.isMousedown) return
+
     const { dx, dy } = this.lastMouseSize
-    const element = this.app.elementFactory.getElement(this.options.id!)
-    element.move(element.x + dx, element.y + dy)
-    this.app.render()
+    this.app.emit(ElementEventEnum.Update, {
+      id: this.options.id!,
+      dx,
+      dy,
+      dw: 0,
+      dh: 0,
+      type: this.type
+    })
   }
 }

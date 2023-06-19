@@ -1,5 +1,7 @@
 export type ElementType = | 'base' | 'rect' | 'select'
 
+export type UpdateType = | 'rect' | 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'
+
 export type Point = {
   x: number
   y: number
@@ -36,7 +38,7 @@ export interface Whiteboard {
   mousedownPoint: Point
   elementFactory: ElementFactory
   history: History
-  controllerContainer: ControllerContainer
+  controller: Controller
   status: WhiteboardStatus
 
   on: Function
@@ -68,7 +70,6 @@ export interface BaseElement {
   app: Whiteboard
   id: number
   type: ElementType
-  start: ElementOptions
   x: number
   y: number
   width: number
@@ -128,12 +129,21 @@ export interface History {
   canRedo (): boolean
 }
 
-export interface ControllerContainer {
+export interface Controller {
   app: Whiteboard
-  rectList: any[]
+  containerList: any[]
 
   create (options: ElementObject): void
 
   remove (id: number): void
+}
+
+export type UpdateElementOptions = {
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
+  id: number,
+  type: UpdateType
 }
 

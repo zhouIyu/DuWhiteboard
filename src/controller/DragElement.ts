@@ -1,4 +1,5 @@
-import { Point, Whiteboard } from '../../index'
+import { ElementOptions, Point, UpdateElementOptions, Whiteboard } from '../../index'
+import { ElementEventEnum } from '../enum'
 
 export default class DragElement {
   isMousedown: boolean = false
@@ -10,6 +11,8 @@ export default class DragElement {
     dx: 0,
     dy: 0
   }
+  padding: number = 5
+  type: string = ''
   // 抽象方法
   // @ts-ignore
   #_ele: HTMLElement
@@ -23,9 +26,12 @@ export default class DragElement {
   }
 
   app: Whiteboard
+  options: ElementOptions
 
-  constructor(app: Whiteboard) {
+  constructor(app: Whiteboard, options: ElementOptions) {
     this.app = app
+    this.options = options
+    this.app.on(ElementEventEnum.Update, this.onUpdate.bind(this))
   }
 
   bindEvent() {
@@ -47,7 +53,6 @@ export default class DragElement {
   }
 
   remove() {
-    document.body.removeChild(this.#_ele)
     this.offEvent()
   }
 
@@ -89,9 +94,6 @@ export default class DragElement {
       dy = bottom - this.#_ele.offsetTop - this.#_ele.offsetHeight - 10
     }
 
-    this.#_ele.style.left = `${this.#_ele.offsetLeft + dx}px`
-    this.#_ele.style.top = `${this.#_ele.offsetTop + dy}px`
-
     this.lastMouseSize = {
       dx,
       dy
@@ -100,6 +102,11 @@ export default class DragElement {
       x: e.clientX,
       y: e.clientY
     }
+
+    this.handleMove()
+
+    this.#_ele.style.left = `${this.#_ele.offsetLeft + dx}px`
+    this.#_ele.style.top = `${this.#_ele.offsetTop + dy}px`
   }
 
   onMouseup(e: MouseEvent) {
@@ -113,6 +120,7 @@ export default class DragElement {
       x: 0,
       y: 0
     }
+    this.handleMoveUp()
   }
 
   onMouseleave(e: MouseEvent) {
@@ -121,4 +129,17 @@ export default class DragElement {
       this.onMouseup(e)
     }
   }
+
+  onUpdate(options: UpdateElementOptions) {
+    if (options.type === this.type) return
+    if (options.id === this.options.id) {
+      this.handleUpdate(options)
+    }
+  }
+
+  handleMove() {}
+
+  handleMoveUp() {}
+
+  handleUpdate(_options: UpdateElementOptions) {}
 }

@@ -1,26 +1,49 @@
-import { ElementObject, Whiteboard } from '../../index'
+import { ElementOptions, Whiteboard } from '../../index'
 import ControllerRect from './Rect'
+import ControllerCircle from './Circle'
+import { DirectionEnum } from '../enum'
 
 export default class Container {
   app: Whiteboard
-  rectList: ControllerRect[] = []
+  options: ElementOptions
+  idPrefix: string = 'whiteboard-selection-'
+  ele: HTMLElement
+  rect: ControllerRect
+  circleList: ControllerCircle[] = []
 
-  constructor(app: Whiteboard) {
+  constructor(app: Whiteboard, options: ElementOptions) {
     this.app = app
+    this.options = options
+    this.ele = this.create()
+    this.rect = this.createRect()
+    this.createCircle()
   }
 
-  create(options: ElementObject) {
-    console.log('create', options)
-    const rect = new ControllerRect(this.app, options)
-    this.rectList.push(rect)
+  createRect() {
+    const rect = new ControllerRect(this.app, this.options)
+    this.ele.appendChild(rect.ele)
+    return rect
   }
 
-  remove(id: number) {
-    const index = this.rectList.findIndex((item) => item.options.id === id)
-    if (index !== -1) {
-      const rect = this.rectList[index]
-      rect.remove()
-      this.rectList.splice(index, 1)
-    }
+  createCircle() {
+    const list = [DirectionEnum.BottomRight]
+    list.forEach((type) => {
+      const circle = new ControllerCircle(this.app, this.options, type)
+      this.ele.appendChild(circle.ele)
+      this.circleList.push(circle)
+    })
+  }
+
+  create() {
+    const $container = document.createElement('div')
+    $container.id = `${this.idPrefix}${this.options.id}`
+    document.body.appendChild($container)
+    return $container
+  }
+
+  remove() {
+    this.rect.remove()
+    this.circleList.forEach((item) => item.remove())
+    document.body.removeChild(this.ele)
   }
 }
