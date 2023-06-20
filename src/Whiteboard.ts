@@ -72,6 +72,14 @@ export default class Whiteboard {
     this.controller = new Controller(this)
     this.selection = new Selection(this)
 
+    this.controller.create({
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+      id: 1
+    })
+
     // 绑定事件
     this.bindEvent()
   }

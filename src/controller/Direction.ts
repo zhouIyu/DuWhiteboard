@@ -31,6 +31,7 @@ export default class Direction extends DragElement {
 
   setPosition() {
     const { x, y, width, height } = this.options
+    console.log(this.options)
     const canvas = this.app.canvas
     const canvasOffsetLeft = canvas.offsetLeft
     const canvasOffsetTop = canvas.offsetTop
@@ -39,24 +40,24 @@ export default class Direction extends DragElement {
     let cursor = 'default'
     switch (this.type) {
       case DirectionEnum.TopLeft:
-        left = x - this.radius + canvasOffsetLeft
-        top = y - this.radius + canvasOffsetTop
-        cursor = 'nw-resize'
+        left = x - this.radius - this.padding + canvasOffsetLeft
+        top = y - this.radius - this.padding + canvasOffsetTop
+        cursor = 'nwse-resize'
         break
       case DirectionEnum.TopRight:
-        left = x + width - this.radius + canvasOffsetLeft
-        top = y - this.radius + canvasOffsetTop
-        cursor = 'ne-resize'
+        left = x + width - this.radius + this.padding + canvasOffsetLeft
+        top = y - this.radius - this.padding + canvasOffsetTop
+        cursor = 'nesw-resize'
         break
       case DirectionEnum.BottomLeft:
-        left = x - this.radius + canvasOffsetLeft
-        top = y + height - this.radius + canvasOffsetTop
-        cursor = 'sw-resize'
+        left = x - this.radius - this.padding + canvasOffsetLeft
+        top = y + height - this.radius + this.padding + canvasOffsetTop
+        cursor = 'nesw-resize'
         break
       case DirectionEnum.BottomRight:
-        left = x + width - this.radius + canvasOffsetLeft + 5
-        top = y + height - this.radius + canvasOffsetTop + 5
-        cursor = 'se-resize'
+        left = x + width - this.radius + this.padding + canvasOffsetLeft
+        top = y + height - this.radius + this.padding + canvasOffsetTop
+        cursor = 'nwse-resize'
         break
     }
     this.ele.style.cursor = cursor
@@ -66,22 +67,66 @@ export default class Direction extends DragElement {
 
   handleMove() {
     if (!this.isMousedown) return
-    const { dx, dy } = this.lastMouseSize
+    const { x, y } = this.lastMouseSize
+
+    let dw = 0
+    let dh = 0
+    let dx = 0
+    let dy = 0
+    switch (this.type) {
+      case DirectionEnum.TopLeft:
+        dw = -x
+        dh = -y
+        dx = x
+        dy = y
+        break
+      case DirectionEnum.TopRight:
+        dw = x
+        dh = -y
+        dx = 0
+        dy = y
+        break
+      case DirectionEnum.BottomLeft:
+        dw = -x
+        dh = y
+        dx = x
+        dy = 0
+        break
+      case DirectionEnum.BottomRight:
+        dw = x
+        dh = y
+        dx = 0
+        dy = 0
+        break
+    }
+
     this.app.emit(ElementEventEnum.Update, {
       id: this.options.id,
-      dw: dx,
-      dh: dy,
-      dx: 0,
-      dy: 0,
+      dw,
+      dh,
+      dx,
+      dy,
       type: this.type
     })
+    this.options.width += dw
+    this.options.height += dh
+    this.options.x += dx
+    this.options.y += dy
   }
 
   handleUpdate(options: UpdateElementOptions) {
-    const { dx, dy } = options
-    const left = parseInt(this.ele.style.left) + dx
-    const top = parseInt(this.ele.style.top) + dy
-    this.ele.style.left = `${left}px`
-    this.ele.style.top = `${top}px`
+    if (options.type === 'box') {
+      const { dx, dy } = options
+      this.options.x += dx
+      this.options.y += dy
+    } else {
+      const { dw, dh, dx, dy } = options
+      console.log(options)
+      this.options.width += dw
+      this.options.height += dh
+      this.options.x += dx
+      this.options.y += dy
+    }
+    this.setPosition()
   }
 }

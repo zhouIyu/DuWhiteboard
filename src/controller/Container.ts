@@ -26,7 +26,7 @@ export default class Container {
   }
 
   createDirection() {
-    const list = [DirectionEnum.BottomRight]
+    const list = [DirectionEnum.BottomRight, DirectionEnum.BottomLeft, DirectionEnum.TopLeft, DirectionEnum.TopRight]
     list.forEach((type) => {
       const circle = new Direction(this.app, this.options, type)
       this.ele.appendChild(circle.ele)

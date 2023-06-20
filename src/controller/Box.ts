@@ -51,11 +51,11 @@ export default class Box extends DragElement {
   handleMove() {
     if (!this.isMousedown) return
 
-    const { dx, dy } = this.lastMouseSize
+    const { x, y } = this.lastMouseSize
     this.app.emit(ElementEventEnum.Update, {
       id: this.options.id!,
-      dx,
-      dy,
+      dx: x,
+      dy: y,
       dw: 0,
       dh: 0,
       type: this.type

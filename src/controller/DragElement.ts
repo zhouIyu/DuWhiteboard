@@ -8,8 +8,8 @@ export default class DragElement {
     y: 0
   }
   lastMouseSize = {
-    dx: 0,
-    dy: 0
+    x: 0,
+    y: 0
   }
   padding: number = 5
   type: string = ''
@@ -30,7 +30,7 @@ export default class DragElement {
 
   constructor(app: Whiteboard, options: ElementOptions) {
     this.app = app
-    this.options = options
+    this.options = { ...options }
     this.app.on(ElementEventEnum.Update, this.onUpdate.bind(this))
   }
 
@@ -64,8 +64,8 @@ export default class DragElement {
       y: e.clientY
     }
     this.lastMouseSize = {
-      dx: 0,
-      dy: 0
+      x: 0,
+      y: 0
     }
   }
 
@@ -95,8 +95,8 @@ export default class DragElement {
     }
 
     this.lastMouseSize = {
-      dx,
-      dy
+      x: dx,
+      y: dy
     }
     this.mousedownPoint = {
       x: e.clientX,
@@ -113,8 +113,8 @@ export default class DragElement {
     if (e.target !== this.#_ele) return
     this.isMousedown = false
     this.lastMouseSize = {
-      dx: 0,
-      dy: 0
+      x: 0,
+      y: 0
     }
     this.mousedownPoint = {
       x: 0,
