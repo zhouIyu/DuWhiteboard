@@ -2,7 +2,7 @@ import { ElementOptions, ElementType, Point, WhiteboardOptions, WhiteboardStatus
 import Factory from './Factory'
 import History from './History'
 import EventEmitter from 'eventemitter3'
-import { ElementTypeEnum, EmitEventEnum } from './enum'
+import { ElementEventEnum, ElementTypeEnum, EmitEventEnum } from './enum'
 import Controller from './controller'
 import Selection from './Selection'
 
@@ -159,7 +159,7 @@ export default class Whiteboard {
     this.isMousedown = false
     this.mousedownPoint = { x: 0, y: 0 }
     if (this.isCreateElement) {
-      this.history.add()
+      this.emit(ElementEventEnum.UpdateComplete, this.factory.getActiveElement()!.id)
     } else {
       this.selection.selected()
       this.render()

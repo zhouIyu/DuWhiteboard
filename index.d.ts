@@ -11,11 +11,11 @@ export type ElementOptions = {
   x: number
   y: number
   width: number
-  height: number
+  height: number,
   id?: number
 }
 
-export type ElementObject = ElementOptions & { type: ElementType, id: number }
+export type ElementObject = ElementOptions & { type: ElementType, id: numberm }
 
 export type WhiteboardOptions = {
   width?: number
@@ -117,9 +117,9 @@ export interface Factory {
 export interface History {
   app: Whiteboard
   redoList: ElementObject[]
-  undoList: T[]
+  undoList: ElementObject[]
 
-  add (): void
+  add (options: ElementObject): void
 
   redo (): void
 

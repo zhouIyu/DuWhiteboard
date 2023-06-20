@@ -24,6 +24,7 @@ export default class BaseElement {
     this.id = options.id || Date.now()
 
     this.app.on(ElementEventEnum.Update, this.onUpdate.bind(this))
+    this.app.on(ElementEventEnum.UpdateComplete, this.onUpdateComplete.bind(this))
   }
 
   onUpdate(options: UpdateElementOptions) {
@@ -34,6 +35,12 @@ export default class BaseElement {
       const height = options.dh + this.height
       this.update({ x, y, width, height })
       this.app.render()
+    }
+  }
+
+  onUpdateComplete(id: number) {
+    if (id === this.id) {
+      this.app.history.add(this.getOptions())
     }
   }
 

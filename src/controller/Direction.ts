@@ -31,7 +31,6 @@ export default class Direction extends DragElement {
 
   setPosition() {
     const { x, y, width, height } = this.options
-    console.log(this.options)
     const canvas = this.app.canvas
     const canvasOffsetLeft = canvas.offsetLeft
     const canvasOffsetTop = canvas.offsetTop
@@ -121,7 +120,6 @@ export default class Direction extends DragElement {
       this.options.y += dy
     } else {
       const { dw, dh, dx, dy } = options
-      console.log(options)
       this.options.width += dw
       this.options.height += dh
       this.options.x += dx

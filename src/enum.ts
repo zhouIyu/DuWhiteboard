@@ -6,6 +6,7 @@ export enum ElementTypeEnum {
 
 export enum ElementEventEnum {
   Update = 'update',
+  UpdateComplete = 'updateComplete',
   Selected = 'selected'
 }
 

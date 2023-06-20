@@ -66,6 +66,7 @@ export default class Factory {
   deleteElement(id: number) {
     const index = this.elementList.findIndex((item) => item.id === id)
     if (index > -1) {
+      this.elementList[index].setSelected(false)
       this.elementList.splice(index, 1)
     }
     const len = this.elementList.length

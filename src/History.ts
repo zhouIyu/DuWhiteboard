@@ -24,9 +24,8 @@ export default class History {
   /**
    * 添加元素
    */
-  add() {
-    const element = this.app.factory.getActiveElementOptions()!
-    this.undoList.push(element)
+  add(options: ElementObject) {
+    this.undoList.unshift(options)
     this.setStatus()
   }
 
@@ -37,9 +36,18 @@ export default class History {
     if (!this.canRedo()) {
       return
     }
-    const item = this.redoList.pop()!
-    this.undoList.push(item)
+    this.app.selection.selected()
+
+    const item = this.redoList.shift()!
+
+    const elementOption = this.undoList.find((ele) => item.id === ele.id)
+    if (elementOption) {
+      this.app.factory.deleteElement(elementOption.id)
+    }
+    this.undoList.unshift(item)
+
     this.app.factory.createElement(item.type, item)
+
     this.app.render()
     this.setStatus()
   }
@@ -51,9 +59,18 @@ export default class History {
     if (!this.canUndo()) {
       return
     }
-    const item = this.undoList.pop()!
-    this.redoList.push(item)
+    this.app.selection.selected()
+
+    const item = this.undoList.shift()!
+    this.redoList.unshift(item)
     this.app.factory.deleteElement(item.id)
+
+    const elementOption = this.undoList.find((ele) => item.id === ele.id)
+
+    if (elementOption) {
+      this.app.factory.createElement(elementOption.type, elementOption)
+    }
+
     this.app.render()
     this.setStatus()
   }

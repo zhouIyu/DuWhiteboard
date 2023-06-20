@@ -120,6 +120,7 @@ export default class DragElement {
       y: 0
     }
     this.handleMoveUp()
+    this.app.emit(ElementEventEnum.UpdateComplete, this.options.id)
   }
 
   onMouseleave(e: MouseEvent) {
