@@ -82,16 +82,15 @@ export default class DragElement {
     }
 
     if (this.#_ele.offsetTop + dy < top) {
-      this.#_ele.style.top = `${top}px`
       dy = top - this.#_ele.offsetTop
     }
 
-    if (this.#_ele.offsetLeft + this.#_ele.offsetWidth + dx > right - 10) {
-      dx = right - this.#_ele.offsetLeft - this.#_ele.offsetWidth - 10
+    if (this.#_ele.offsetLeft + this.#_ele.offsetWidth + dx > right - this.padding * 2) {
+      dx = right - this.#_ele.offsetLeft - this.#_ele.offsetWidth - this.padding * 2
     }
 
-    if (this.#_ele.offsetTop + this.#_ele.offsetHeight + dy > bottom - 10) {
-      dy = bottom - this.#_ele.offsetTop - this.#_ele.offsetHeight - 10
+    if (this.#_ele.offsetTop + this.#_ele.offsetHeight + dy > bottom - this.padding * 2) {
+      dy = bottom - this.#_ele.offsetTop - this.#_ele.offsetHeight - this.padding * 2
     }
 
     this.lastMouseSize = {
